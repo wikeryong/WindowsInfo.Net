@@ -15,8 +15,6 @@ namespace WindowsInfo.Net
             try
             {
                 string filename = "info.txt";
-                FileStream fs = new FileStream(filename, FileMode.Create);
-                StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.Default);
 
                 Console.Write("请输入部门：");
                 string dept = Console.ReadLine();
@@ -24,6 +22,8 @@ namespace WindowsInfo.Net
 
                 Console.Write("请输入姓名：");
                 string name = Console.ReadLine();
+                FileStream fs = new FileStream(dept + "_" + name + "_"+filename, FileMode.Create);
+                StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.Default);
 
                 Console.WriteLine("正在获取信息，请稍后...");
 
