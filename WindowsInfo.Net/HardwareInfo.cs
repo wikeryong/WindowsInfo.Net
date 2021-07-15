@@ -102,8 +102,9 @@ namespace WindowsInfo.Net
             }
         }
         //获取物理硬盘序列号
-        public string GetHardDiskSerialNumber()
+        public List<string> GetHardDiskSerialNumber()
         {
+            List<string> list = new List<string>();
             try
             {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMedia");
@@ -111,20 +112,21 @@ namespace WindowsInfo.Net
                 foreach (ManagementObject mo in searcher.Get())
                 {
                     sHardDiskSerialNumber = mo["SerialNumber"].ToString().Trim();
-                    break;
+                    list.Add(sHardDiskSerialNumber);
                 }
-                return sHardDiskSerialNumber;
+                return list;
             }
             catch
             {
-                return "";
+                return list;
             }
         }
 
 
         //获取网卡地址
-        public string GetNetCardMACAddress()
+        public List<ManagementObject> GetNetCardMACAddress()
         {
+            List<ManagementObject> macs = new List<ManagementObject>();
             try
             {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter WHERE ((MACAddress Is Not NULL) AND (Manufacturer <> 'Microsoft'))");
@@ -132,12 +134,13 @@ namespace WindowsInfo.Net
                 foreach (ManagementObject mo in searcher.Get())
                 {
                     NetCardMACAddress = mo["MACAddress"].ToString().Trim();
+                    macs.Add(mo);
                 }
-                return NetCardMACAddress;
+                return macs;
             }
             catch
             {
-                return "";
+                return macs;
             }
         }
         
@@ -160,18 +163,20 @@ namespace WindowsInfo.Net
         /// <summary>
         /// 获取磁盘序列号
         /// </summary>
-        public string GetDiskSerialNumber()
+        public List<string> GetDiskSerialNumber()
         {
             //这种模式在插入一个U盘后可能会有不同的结果，如插入我的手机时
             String HDid = "";
+            List<string> list = new List<string>();
             ManagementClass mc = new ManagementClass("Win32_DiskDrive");
             ManagementObjectCollection moc = mc.GetInstances();
             foreach (ManagementObject mo in moc)
             {
                 HDid = (string)mo.Properties["Model"].Value;//SerialNumber
-                break;//这名话解决有多个物理盘时产生的问题，只取第一个物理硬盘
+                //break;//这名话解决有多个物理盘时产生的问题，只取第一个物理硬盘
+                list.Add(HDid);
             }
-            return HDid;
+            return list;
         }
 
 
@@ -192,6 +197,21 @@ namespace WindowsInfo.Net
                 }
             }
             return mac;
+        }
+
+        public List<ManagementObject> GetAllMacAddress()
+        {
+            List<ManagementObject> macs = new List<ManagementObject>();
+            ManagementClass mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            ManagementObjectCollection moc = mc.GetInstances();
+            foreach (ManagementObject mo in moc)
+            {
+                if ((bool)mo["IPEnabled"] == true)
+                {
+                    macs.Add(mo);
+                }
+            }
+            return macs;
         }
 
 
