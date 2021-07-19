@@ -10,6 +10,11 @@ namespace WindowsInfo.Net
 {
     class Program
     {
+
+        static void Write(StreamWriter sw,string s)
+        {
+            
+        }
         static void Main(string[] args)
         {
             try
@@ -43,12 +48,14 @@ namespace WindowsInfo.Net
                 HardwareInfo hardwareInfo = new HardwareInfo();
                 sw.WriteLine("本机的MAC地址：" + hardwareInfo.GetLocalMac());
 
+                Console.WriteLine("主板序列号：{0,20:s}", hardwareInfo.GetBIOSSerialNumber());
                 sw.WriteLine("主板序列号：" + hardwareInfo.GetBIOSSerialNumber());
                 sw.WriteLine("主板制造厂商：" + hardwareInfo.GetBoardManufacturer());
                 sw.WriteLine("主板编号：" + hardwareInfo.GetBoardID());
                 sw.WriteLine("主板编号：" + hardwareInfo.GetBoardID());
                 sw.WriteLine("主板型号：" + hardwareInfo.GetBoardType());
 
+                Console.WriteLine("CPU序列号：{0,20:s}", hardwareInfo.GetCPUSerialNumber());
                 sw.WriteLine("CPU序列号：" + hardwareInfo.GetCPUSerialNumber());
                 sw.WriteLine("CPU编号：" + hardwareInfo.GetCPUID());
                 sw.WriteLine("CPU版本信息：" + hardwareInfo.GetCPUVersion());
