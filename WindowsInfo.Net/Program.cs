@@ -8,12 +8,120 @@ using System.Threading.Tasks;
 
 namespace WindowsInfo.Net
 {
+
+    /// <summary>
+    /// windows api 名称
+    /// </summary>
+    public enum WindowsAPIType
+    {
+        /// <summary>
+        /// 内存
+        /// </summary>
+        Win32_PhysicalMemory,
+        /// <summary>
+        /// cpu
+        /// </summary>
+        Win32_Processor,
+        /// <summary>
+        /// 硬盘
+        /// </summary>
+        win32_DiskDrive,
+        /// <summary>
+        /// 电脑型号
+        /// </summary>
+        Win32_ComputerSystemProduct,
+        /// <summary>
+        /// 分辨率
+        /// </summary>
+        Win32_DesktopMonitor,
+        /// <summary>
+        /// 显卡
+        /// </summary>
+        Win32_VideoController,
+        /// <summary>
+        /// 操作系统
+        /// </summary>
+        Win32_OperatingSystem
+
+    }
+    public enum WindowsAPIKeys
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        Name,
+        /// <summary>
+        /// 显卡芯片
+        /// </summary>
+        VideoProcessor,
+        /// <summary>
+        /// 显存大小
+        /// </summary>
+        AdapterRAM,
+        /// <summary>
+        /// 分辨率宽
+        /// </summary>
+        ScreenWidth,
+        /// <summary>
+        /// 分辨率高
+        /// </summary>
+        ScreenHeight,
+        /// <summary>
+        /// 电脑型号
+        /// </summary>
+        Version,
+        /// <summary>
+        /// 硬盘容量
+        /// </summary>
+        Size,
+        /// <summary>
+        /// 内存容量
+        /// </summary>
+        Capacity,
+        /// <summary>
+        /// cpu核心数
+        /// </summary>
+        NumberOfCores
+    }
     class Program
     {
 
-        static void Write(StreamWriter sw,string s)
+        public static string ToGB(double size, double mod)
         {
-            
+            String[] units = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
+            int i = 0;
+            while (size >= mod)
+            {
+                size /= mod;
+                i++;
+            }
+            return Math.Round(size) + units[i];
+        }
+
+        /// <summary>
+        /// 获取硬盘容量
+        /// </summary>
+        public static string GetDiskSize()
+        {
+            string result = string.Empty;
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                string hdId = string.Empty;
+                ManagementClass hardDisk = new ManagementClass(WindowsAPIType.win32_DiskDrive.ToString());
+                ManagementObjectCollection hardDiskC = hardDisk.GetInstances();
+                foreach (ManagementObject m in hardDiskC)
+                {
+                    long capacity = Convert.ToInt64(m[WindowsAPIKeys.Size.ToString()].ToString());
+                    sb.Append(ToGB(capacity, 1000.0) + "+");
+                }
+                result = sb.ToString().TrimEnd('+');
+            }
+            catch
+            {
+
+            }
+            return result;
         }
         static void Main(string[] args)
         {
@@ -64,6 +172,9 @@ namespace WindowsInfo.Net
 
                 //sw.WriteLine("物理硬盘序列号：" + hardwareInfo.GetHardDiskSerialNumber());
 
+
+                sw.WriteLine("硬盘容量：" + GetDiskSize());
+
                 List<string> hardDiskSerialList = hardwareInfo.GetHardDiskSerialNumber();
                 for (int i = 1; i <= hardDiskSerialList.Count; i++)
                 {
@@ -92,7 +203,8 @@ namespace WindowsInfo.Net
                     sw.WriteLine("  MAC："+s["MACAddress"]+"描述：");
                 }
 
-                sw.WriteLine("物理内存：" + hardwareInfo.GetPhysicalMemory());
+                string totalMemory = hardwareInfo.GetPhysicalMemory();
+                sw.WriteLine("物理内存：" + totalMemory+"，大小（GB）："+ ToGB(float.Parse(totalMemory), 1024));
 
                 sw.WriteLine("显卡PNPDeviceID：" + hardwareInfo.GetVideoPNPID());
                 sw.WriteLine("声卡PNPDeviceID：" + hardwareInfo.GetSoundPNPID());
